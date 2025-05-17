@@ -6,14 +6,14 @@ class Product:
     def __init__(self, name: str, description: str, price: float, quantity: int):
         self.name = name
         self.description = description
-        self._price = 0  # Инициализируем приватный атрибут
+        self.__price = 0  # Приватный атрибут с двойным подчеркиванием
         self.quantity = int(quantity)
         self.price = float(price)  # Вызов сеттера для проверки значения
 
     @property
     def price(self) -> float:
         """Геттер для получения текущей цены"""
-        return self._price
+        return self.__price
 
     @price.setter
     def price(self, value: float):
@@ -21,7 +21,7 @@ class Product:
         if value <= 0:
             print("Цена не должна быть нулевая или отрицательная")
         else:
-            self._price = value
+            self.__price = value
 
     @classmethod
     def new_product(cls, data: Dict[str, Any]) -> "Product":
