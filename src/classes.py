@@ -68,6 +68,19 @@ class Product:
             quantity=data["quantity"]
         )
 
+    def __str__(self) -> str:
+        """Строковое представление продукта"""
+        return f"{self.name}, {int(self.price)} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other: "Product") -> float:
+        """
+        Реализует операцию сложения двух продуктов.
+        Возвращает общую стоимость: цена × количество.
+        """
+        if isinstance(other, Product):
+            return self.price * self.quantity + other.price * other.quantity
+        raise TypeError("Можно складывать только объекты класса Product")
+
 
 class Category:
     category_count = 0
@@ -89,9 +102,9 @@ class Category:
 
     @property
     def products(self) -> List[str]:
-        """Возвращает список товаров в формате:
-        'Название продукта, 80 руб. Остаток: 15 шт.'"""
-        return [
-            f"{product.name}, {int(product.price)} руб. Остаток: {product.quantity} шт."
-            for product in self._products
-        ]
+        """Возвращает список строкового представления продуктов"""
+        return [str(product) for product in self._products]
+
+    def __str__(self) -> str:
+        """Строковое представление категории"""
+        return f"{self.name}, количество продуктов: {len(self._products)} шт."
