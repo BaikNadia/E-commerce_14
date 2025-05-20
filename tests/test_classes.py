@@ -128,5 +128,3 @@ def test_add_product_updates_counter():
     category.add_product(product)
     assert Category.product_count == 1
     assert product in category._products
-
-
