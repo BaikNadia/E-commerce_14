@@ -61,7 +61,6 @@ def test_product_count_initialization():
     assert Category.product_count == 2
 
 
-
 def test_product_count_multiple_categories():
     """Проверяет общий подсчёт продуктов в нескольких категориях"""
     product1 = Product("Телефон", "Смартфон", 50000.0, 10)
@@ -72,6 +71,7 @@ def test_product_count_multiple_categories():
     Category("Компьютеры", "Стационарные устройства", [product3])
 
     assert Category.product_count == 3
+
 
 # === Тесты для класса Product ===
 def test_product_initialization_with_positive_price():
@@ -94,7 +94,6 @@ def test_product_price_setter_with_valid_price():
     product = Product("Телефон", "Простой", 10000, 10)
     product.price = 12000
     assert product.price == 12000
-
 
 
 def test_product_new_product_with_invalid_type():
@@ -121,10 +120,57 @@ def test_category_products_property_format():
     assert category.products == expected
 
 
-
 def test_add_product_updates_counter():
     product = Product("Ноутбук", "Мощный", 99999.99, 5)
     category = Category("Электроника", "Техника")
     category.add_product(product)
     assert Category.product_count == 1
     assert product in category._products
+
+
+def test_add_two_products():
+    """Проверяет, что сложение двух продуктов возвращает правильную общую стоимость"""
+    product1 = Product("Ноутбук", "Мощный", 100.0, 10)
+    product2 = Product("Смартфон", "Флагман", 200.0, 2)
+
+    total = product1 + product2
+    assert total == 1400.0  # 100 * 10 + 200 * 2 = 1400
+
+
+def test_add_product_with_non_product():
+    """Проверяет, что при попытке сложить Product с не-Product выбрасывается TypeError"""
+    product = Product("Ноутбук", "Мощный", 100.0, 10)
+
+    with pytest.raises(TypeError):
+        product + "Не продукт"
+
+
+def test_add_with_zero_quantity():
+    """Проверяет, что товар с нулевым количеством не влияет на сумму"""
+    product1 = Product("Ноутбук", "Мощный", 100.0, 0)
+    product2 = Product("Смартфон", "Флагман", 200.0, 5)
+
+    total = product1 + product2
+    assert total == 1000.0  # 100 * 0 + 200 * 5 = 1000
+
+
+def test_add_with_negative_price(capfd):
+    """Проверяет, что отрицательная цена не учитывается в сумме"""
+    product1 = Product("Ноутбук", "Мощный", -100.0, 10)  # сеттер заблокирует это
+    product2 = Product("Смартфон", "Флагман", 200.0, 5)
+
+    # Проверяем, что цена не установлена
+    assert product1.price == 0  # так как была отрицательная цена
+
+    total = product1 + product2
+    assert total == 1000.0  # 0 * 10 + 200 * 5 = 1000
+
+
+def test_product_str():
+    product = Product("Ноутбук", "Мощный", 99999.99, 5)
+    assert str(product) == "Ноутбук, 99999 руб. Остаток: 5 шт."
+
+
+def test_category_str():
+    category = Category("Электроника", "Техника", [])
+    assert str(category) == "Электроника, количество продуктов: 0 шт."
