@@ -1,4 +1,5 @@
 from src.classes import Product, Category
+
 # from src.utils import load_data_from_json
 
 if __name__ == '__main__':
