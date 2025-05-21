@@ -171,6 +171,10 @@ def test_product_str():
     assert str(product) == "Ноутбук, 99999 руб. Остаток: 5 шт."
 
 
-def test_category_str():
-    category = Category("Электроника", "Техника", [])
-    assert str(category) == "Электроника, количество продуктов: 0 шт."
+def test_category_str_with_total_quantity():
+    """Проверяет, что метод __str__ возвращает общее количество товаров"""
+    product1 = Product("Ноутбук", "Мощный", 99999.99, 5)
+    product2 = Product("Смартфон", "Флагман", 69999.99, 10)
+    category = Category("Электроника", "Техника", [product1, product2])
+
+    assert str(category) == "Электроника, общее количество товаров: 15 шт."
