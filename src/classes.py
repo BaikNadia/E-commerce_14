@@ -75,11 +75,41 @@ class Product:
     def __add__(self, other: "Product") -> float:
         """
         Реализует операцию сложения двух продуктов.
-        Возвращает общую стоимость: цена × количество.
+        Можно складывать только объекты одного класса.
         """
-        if isinstance(other, Product):
-            return self.price * self.quantity + other.price * other.quantity
-        raise TypeError("Можно складывать только объекты класса Product")
+        if type(self) is not type(other):
+            raise TypeError("Можно складывать только товары одного типа")
+        return self.price * self.quantity + other.price * other.quantity
+
+
+class Smartphone(Product):
+    def __init__(self, name: str, description: str, price: float, quantity: int, efficiency: float, model: str,
+                 memory: int, color: str):
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = int(memory)  # Явное преобразование
+        self.color = str(color)
+
+    def __str__(self) -> str:
+        base = super().__str__()  # Возвращает строку вида "Ноутбук, 99999 руб. Остаток: 5 шт."
+        # Разделяем строку по " шт." и добавляем доп. информацию
+        parts = base.split(" шт.")
+        return f"{parts[0]} шт., модель: {self.model}, память: {self.memory} ГБ, цвет: {self.color}"
+
+
+class LawnGrass(Product):
+    def __init__(self, name: str, description: str, price: float, quantity: int, country: str, germination_period: str,
+                 color: str):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = str(color)
+
+    def __str__(self) -> str:
+        base = super().__str__()  # "Ноутбук, 99999 руб. Остаток: 5 шт."
+        parts = base.split(" шт.")
+        return f"{parts[0]} шт., страна: {self.country}, срок прорастания: {self.germination_period}, цвет: {self.color}"
 
 
 class Category:
@@ -91,21 +121,20 @@ class Category:
         self.description = description
         self._products = products if products is not None else []
 
-        # Обновляем статические счётчики
         Category.category_count += 1
         Category.product_count += len(self._products)
 
     def add_product(self, product: Product):
         """Добавляет товар в категорию и обновляет счётчики"""
+        if not isinstance(product, Product):
+            raise TypeError("Можно добавлять только объекты класса Product или его наследников")
         self._products.append(product)
         Category.product_count += 1
 
     @property
     def products(self) -> List[str]:
-        """Возвращает список строкового представления продуктов"""
         return [str(product) for product in self._products]
 
     def __str__(self) -> str:
-        """Строковое представление категории с общей суммой товаров на складе"""
         total_quantity = sum(product.quantity for product in self._products)
         return f"{self.name}, общее количество товаров: {total_quantity} шт."
