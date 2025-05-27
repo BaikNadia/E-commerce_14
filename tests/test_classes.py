@@ -1,6 +1,6 @@
 import pytest
 
-from src.classes import Category, Product
+from src.classes import Category, Product, Smartphone, LawnGrass
 
 
 # === Фикстура для сброса счётчиков перед каждым тестом ===
@@ -178,3 +178,37 @@ def test_category_str_with_total_quantity():
     category = Category("Электроника", "Техника", [product1, product2])
 
     assert str(category) == "Электроника, общее количество товаров: 15 шт."
+
+
+def test_add_same_class_products():
+    smartphone1 = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    smartphone2 = Smartphone("Samsung", "Флагман", 90000, 10, "Exynos", "S23", 512, "Серебристый")
+    total = smartphone1 + smartphone2
+    assert total == 100000 * 5 + 90000 * 10
+
+
+def test_add_different_class_products():
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    grass = LawnGrass("Трава", "Для дачи", 500, 20, "Россия", "3 недели", "Зеленый")
+
+    with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
+        smartphone + grass
+
+
+def test_add_with_non_product():
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
+        smartphone + 500  # Теперь будет ошибка, так как 500 — не Product
+
+
+def test_add_with_zero_quantity():
+    smartphone1 = Smartphone("iPhone", "Флагман", 100000, 0, "A15", "iPhone 13", 256, "Черный")
+    smartphone2 = Smartphone("Samsung", "Флагман", 90000, 10, "Exynos", "S23", 512, "Серебристый")
+    total = smartphone1 + smartphone2
+    assert total == 90000 * 10
+
+
+def test_category_add_product_with_invalid_type():
+    category = Category("Электроника", "Техника")
+    with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product или его наследников"):
+        category.add_product("Не продукт")
