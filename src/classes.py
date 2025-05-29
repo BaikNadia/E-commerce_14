@@ -77,13 +77,16 @@ class Product:
         Реализует операцию сложения двух продуктов.
         Можно складывать только объекты одного класса.
         """
+        if not isinstance(other, Product):
+            raise TypeError("Можно складывать только товары и их наследников")
         if type(self) is not type(other):
             raise TypeError("Можно складывать только товары одного типа")
         return self.price * self.quantity + other.price * other.quantity
 
 
+
 class Smartphone(Product):
-    def __init__(self, name: str, description: str, price: float, quantity: int, efficiency: float, model: str,
+    def __init__(self, name: str, description: str, price: float, quantity: int, efficiency: str, model: str,
                  memory: int, color: str):
         super().__init__(name, description, price, quantity)
         self.efficiency = efficiency
@@ -93,7 +96,7 @@ class Smartphone(Product):
 
     def __str__(self) -> str:
         base = super().__str__()  # Возвращает строку вида "Ноутбук, 99999 руб. Остаток: 5 шт."
-        # Разделяем строку по " шт." и добавляем доп. информацию
+        # Разделяем строку по "шт." и добавляем дополнительную информацию
         parts = base.split(" шт.")
         return f"{parts[0]} шт., модель: {self.model}, память: {self.memory} ГБ, цвет: {self.color}"
 

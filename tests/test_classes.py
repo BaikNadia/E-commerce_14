@@ -195,20 +195,38 @@ def test_add_different_class_products():
         smartphone + grass
 
 
-def test_add_with_non_product():
-    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
-    with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
-        smartphone + 500  # Теперь будет ошибка, так как 500 — не Product
-
-
-def test_add_with_zero_quantity():
-    smartphone1 = Smartphone("iPhone", "Флагман", 100000, 0, "A15", "iPhone 13", 256, "Черный")
+def test_add_same_class_products():
+    """Проверяет, что товары одного класса можно складывать"""
+    smartphone1 = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
     smartphone2 = Smartphone("Samsung", "Флагман", 90000, 10, "Exynos", "S23", 512, "Серебристый")
-    total = smartphone1 + smartphone2
-    assert total == 90000 * 10
+    assert smartphone1 + smartphone2 == 100000 * 5 + 90000 * 10
 
 
-def test_category_add_product_with_invalid_type():
+def test_add_products_of_different_types_raises_type_error():
+    """Проверяет, что нельзя сложить товары разных типов"""
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    grass = LawnGrass("Трава", "Для дачи", 500, 20, "Россия", "3 недели", "Зелёный")
+    with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
+        smartphone + grass
+
+
+def test_add_non_product_raises_type_error():
+    """Проверяет, что нельзя сложить товар с не-Product"""
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    with pytest.raises(TypeError, match="Можно складывать только товары и их наследников"):
+        smartphone + 500  # Число вместо Product
+
+
+def test_add_invalid_type_to_category():
+    """Проверяет, что нельзя добавить не-Product в категорию"""
     category = Category("Электроника", "Техника")
     with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product или его наследников"):
         category.add_product("Не продукт")
+
+
+def test_add_subclass_to_category():
+    """Проверяет, что можно добавлять наследников Product"""
+    category = Category("Электроника", "Техника")
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    category.add_product(smartphone)
+    assert len(category._products) == 1
