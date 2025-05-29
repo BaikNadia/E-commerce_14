@@ -181,38 +181,39 @@ def test_category_str_with_total_quantity():
 
 
 def test_add_same_class_products():
-    smartphone1 = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
-    smartphone2 = Smartphone("Samsung", "Флагман", 90000, 10, "Exynos", "S23", 512, "Серебристый")
+    smartphone1 = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                             "iPhone 13", 256, "Черный")
+    smartphone2 = Smartphone("Samsung", "Флагман", 90000, 10, "Exynos",
+                             "S23", 512, "Серебристый")
     total = smartphone1 + smartphone2
     assert total == 100000 * 5 + 90000 * 10
 
 
 def test_add_different_class_products():
-    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
-    grass = LawnGrass("Трава", "Для дачи", 500, 20, "Россия", "3 недели", "Зеленый")
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                            "iPhone 13", 256, "Черный")
+    grass = LawnGrass("Трава", "Для дачи", 500, 20, "Россия",
+                      "3 недели", "Зеленый")
 
     with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
         smartphone + grass
 
 
-def test_add_same_class_products():
-    """Проверяет, что товары одного класса можно складывать"""
-    smartphone1 = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
-    smartphone2 = Smartphone("Samsung", "Флагман", 90000, 10, "Exynos", "S23", 512, "Серебристый")
-    assert smartphone1 + smartphone2 == 100000 * 5 + 90000 * 10
-
 
 def test_add_products_of_different_types_raises_type_error():
     """Проверяет, что нельзя сложить товары разных типов"""
-    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
-    grass = LawnGrass("Трава", "Для дачи", 500, 20, "Россия", "3 недели", "Зелёный")
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                            "iPhone 13", 256, "Черный")
+    grass = LawnGrass("Трава", "Для дачи", 500, 20, "Россия",
+                      "3 недели", "Зелёный")
     with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
         smartphone + grass
 
 
 def test_add_non_product_raises_type_error():
     """Проверяет, что нельзя сложить товар с не-Product"""
-    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                            "iPhone 13", 256, "Черный")
     with pytest.raises(TypeError, match="Можно складывать только товары и их наследников"):
         smartphone + 500  # Число вместо Product
 
@@ -227,6 +228,53 @@ def test_add_invalid_type_to_category():
 def test_add_subclass_to_category():
     """Проверяет, что можно добавлять наследников Product"""
     category = Category("Электроника", "Техника")
-    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                            "iPhone 13", 256, "Черный")
     category.add_product(smartphone)
     assert len(category._products) == 1
+
+
+if __name__ == "__main__":
+    # Создание продуктов
+    product3 = Product("Ноутбук", "Мощный", 99999.99, 5)
+    product4 = Product("Смартфон", "Флагман", 69999.99, 10)
+
+    # Проверка строкового представления
+    print(str(product3))
+    print(str(product4))
+
+    # Проверка сложения
+    try:
+        print(product3 + product4)
+    except TypeError as e:
+        print(f"Ошибка: {e}")
+
+    # Создание смартфона и травы
+    smartphone3 = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                             "iPhone 13", 256, "Черный")
+    smartphone4 = Smartphone("Samsung Galaxy", "Флагман", 90000, 10, "Exynos",
+                             "S23", 512, "Серебристый")
+    lawn_grass1 = LawnGrass("Газонная трава", "Для дачи", 500, 20, "Россия",
+                            "3 недели", "Зелёный")
+
+    # Проверка сложения внутри класса
+    print(smartphone3 + smartphone4)  # 100000 * 5 + 90000 * 10 = 1400000.0
+    print(lawn_grass1 + lawn_grass1)  # 500 * 20 + 500 * 20 = 20000.0
+
+    # Попытка сложить разные классы
+    try:
+        smartphone3 + lawn_grass1
+    except TypeError as e:
+        print(f"Ошибка: {e}")  # Можно складывать только товары одного типа
+
+    # Добавление в категорию
+    electronics = Category("Электроника", "Техника")
+    electronics.add_product(smartphone3)
+    electronics.add_product(smartphone4)
+
+    try:
+        electronics.add_product("Не продукт")
+    except TypeError as e:
+        print(f"Ошибка: {e}")  # Можно добавлять только объекты класса Product или его наследников
+
+    print(electronics)  # Электроника, общее количество товаров: 15 шт.
