@@ -14,11 +14,13 @@ class LogMixin:
         super().__init__(name=name, description=description, price=price, quantity=quantity)
         print(f"{self.__class__.__name__}({name}, {description}, {price}, {quantity})")
 
-
 class Product(LogMixin, BaseProduct):
     def __init__(self, name: str, description: str, price: float, quantity: int):
-        super().__init__(name=name, description=description, price=price, quantity=quantity)
+        if quantity <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+        super().__init__(name, description, price, quantity)
         self.__price = price if price > 0 else 0
+
 
     @property
     def price(self) -> float:
@@ -113,6 +115,16 @@ class Category:
 
         Category.category_count += 1
         Category.product_count += len(self._products)
+
+    def middle_price(self) -> float:
+        """Возвращает среднюю цену товаров в категории"""
+        if not self._products:
+            return 0
+        try:
+            total = sum(product.price for product in self._products)
+            return total / len(self._products)
+        except ZeroDivisionError:
+            return 0
 
     def add_product(self, product: Product):
         if not isinstance(product, Product):
