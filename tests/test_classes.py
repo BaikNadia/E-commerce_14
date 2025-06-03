@@ -1,6 +1,6 @@
 import pytest
 
-from src.classes import Category, Product, Smartphone, LawnGrass
+from src.classes import Smartphone, LawnGrass
 
 
 # === Фикстура для сброса счётчиков перед каждым тестом ===
@@ -137,22 +137,6 @@ def test_add_two_products():
     assert total == 1400.0  # 100 * 10 + 200 * 2 = 1400
 
 
-# def test_add_product_with_non_product():
-#     """Проверяет, что при попытке сложить Product с не-Product выбрасывается TypeError"""
-#     product = Product("Ноутбук", "Мощный", 100.0, 10)
-#
-#     with pytest.raises(TypeError):
-#         product + "Не продукт"
-
-
-def test_add_with_zero_quantity():
-    """Проверяет, что товар с нулевым количеством не влияет на сумму"""
-    product1 = Product("Ноутбук", "Мощный", 100.0, 0)
-    product2 = Product("Смартфон", "Флагман", 200.0, 5)
-
-    total = product1 + product2
-    assert total == 1000.0  # 100 * 0 + 200 * 5 = 1000
-
 
 def test_add_with_negative_price(capfd):
     """Проверяет, что отрицательная цена не учитывается в сумме"""
@@ -199,7 +183,6 @@ def test_add_different_class_products():
         smartphone + grass
 
 
-
 def test_add_products_of_different_types_raises_type_error():
     """Проверяет, что нельзя сложить товары разных типов"""
     smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
@@ -208,21 +191,6 @@ def test_add_products_of_different_types_raises_type_error():
                       "3 недели", "Зелёный")
     with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
         smartphone + grass
-
-
-# def test_add_non_product_raises_type_error():
-#     """Проверяет, что нельзя сложить товар с не-Product"""
-#     smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
-#                             "iPhone 13", 256, "Черный")
-#     with pytest.raises(TypeError, match="Можно складывать только товары и их наследников"):
-#         smartphone + 500  # Число вместо Product
-
-
-# def test_add_invalid_type_to_category():
-#     """Проверяет, что нельзя добавить не-Product в категорию"""
-#     category = Category("Электроника", "Техника")
-#     with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product или его наследников"):
-#         category.add_product("Не продукт")
 
 
 def test_add_subclass_to_category():
@@ -256,6 +224,7 @@ def test_log_mixin_for_lawn_grass(capsys):
     captured = capsys.readouterr()
     assert "LawnGrass(Газонная трава, Для дачи, 500, 20)" in captured.out
 
+
 def test_smartphone_initialization():
     """Проверяет инициализацию атрибутов у смартфона"""
     smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
@@ -275,6 +244,7 @@ def test_smartphone_str():
     smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
                             "iPhone 13", 256, "Черный")
     assert str(smartphone) == "iPhone, 100000 руб. Остаток: 5 шт., модель: iPhone 13, память: 256 ГБ, цвет: Черный"
+
 
 def test_lawn_grass_initialization():
     """Проверяет инициализацию атрибутов у газонной травы"""
@@ -297,13 +267,6 @@ def test_lawn_grass_str():
                           "срок прорастания: 3 недели, цвет: Зелёный")
 
 
-# def test_add_same_class_products():
-#     """Проверяет, что товары одного класса складываются корректно"""
-#     product1 = Product("Товар1", "Описание1", 100, 10)
-#     product2 = Product("Товар2", "Описание2", 200, 2)
-#     assert product1 + product2 == 1400  # 100 * 10 + 200 * 2
-
-
 def test_add_products_of_different_types():
     """Проверяет, что нельзя сложить товары разных типов"""
     smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
@@ -312,25 +275,12 @@ def test_add_products_of_different_types():
         smartphone + grass
 
 
-# def test_add_with_non_product():
-#     """Проверяет, что нельзя складывать Product с не-Product"""
-#     product = Product("Товар", "Описание", 100, 10)
-#     with pytest.raises(TypeError, match="Можно складывать только товары и их наследников"):
-#         product + "Не продукт"
-
 def test_add_valid_product_to_category():
     """Проверяет, что можно добавить корректный продукт в категорию"""
     product = Product("Товар", "Описание", 100, 10)
     category = Category("Электроника", "Техника")
     category.add_product(product)
     assert len(category._products) == 1
-
-
-# def test_add_invalid_type_to_category():
-#     """Проверяет, что нельзя добавить не-Product в категорию"""
-#     category = Category("Электроника", "Техника")
-#     with pytest.raises(TypeError, match="Можно добавлять только объекты класса Product или его наследников"):
-#         category.add_product("Не продукт")
 
 
 def test_add_smartphone_to_category():
@@ -348,38 +298,6 @@ def test_add_lawn_grass_to_category():
     category.add_product(grass)
     assert len(category._products) == 1
 
-# def test_product_str():
-#     """Проверяет строковое представление товара"""
-#     product = Product("Товар", "Описание", 100, 10)
-#     assert str(product) == "Товар, 100 руб. Остаток: 10 шт."
-
-
-def test_product_add_with_zero_quantity():
-    """Проверяет, что товар с нулевым количеством не влияет на сумму"""
-    product1 = Product("Товар", "Описание", 100, 0)
-    product2 = Product("Товар", "Описание", 200, 5)
-    assert product1 + product2 == 1000  # 100 * 0 + 200 * 5 = 1000
-
-
-# def test_add_with_negative_price(capfd):
-#     """Проверяет, что товар с отрицательной ценой не влияет на сумму"""
-#     product1 = Product("Товар", "Описание", -100, 10)  # сеттер заблокирует отрицательную цену
-#     product2 = Product("Товар", "Описание", 200, 5)
-#     assert product1.price == 0  # цена останется 0
-#     assert product1 + product2 == 1000  # 0 * 10 + 200 * 5 = 1000
-#
-# def test_smartphone_str():
-#     """Проверяет строковое представление смартфона"""
-#     smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
-#     expected = "iPhone, 100000 руб. Остаток: 5 шт., модель: iPhone 13, память: 256 ГБ, цвет: Черный"
-#     assert str(smartphone) == expected
-#
-#
-# def test_lawn_grass_str():
-#     """Проверяет строковое представление газонной травы"""
-#     grass = LawnGrass("Газонная трава", "Для дачи", 500, 20, "Россия", "3 недели", "Зелёный")
-#     expected = "Газонная трава, 500 руб. Остаток: 20 шт., страна: Россия, срок прорастания: 3 недели, цвет: Зелёный"
-#     assert str(grass) == expected
 
 
 def test_add_with_zero_price():
@@ -388,3 +306,32 @@ def test_add_with_zero_price():
     product2 = Product("Товар2", "Описание2", 200, 5)
     assert product1.price == 0
     assert product1 + product2 == 1000  # 0 * 10 + 200 * 5 = 1000
+
+
+def test_product_with_zero_quantity_raises_error():
+    """Проверяет, что при попытке создать товар с quantity=0 выбрасывается ValueError"""
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Товар", "Описание", 100, 0)
+
+
+from src.classes import Product, Category
+
+
+def test_product_with_negative_quantity_raises_error():
+    """Проверяет, что при попытке создать товар с quantity<0 выбрасывается ValueError"""
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Товар", "Описание", 100, -5)
+
+
+def test_category_with_no_products_returns_zero_middle_price():
+    """Проверяет, что у пустой категории average_price == 0"""
+    category = Category("Электроника", "Техника")
+    assert category.middle_price() == 0
+
+
+def test_category_middle_price():
+    """Проверяет, что метод average_price корректно считает среднюю цену"""
+    product1 = Product("Товар1", "Описание1", 100, 10)
+    product2 = Product("Товар2", "Описание2", 200, 5)
+    category = Category("Электроника", "Техника", [product1, product2])
+    assert category.middle_price() == (100 + 200) / 2  # (100 + 200) / 2 = 150.0
