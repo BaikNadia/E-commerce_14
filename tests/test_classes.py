@@ -1,6 +1,6 @@
 import pytest
 
-from src.classes import Category, Product
+from src.classes import Smartphone, LawnGrass
 
 
 # === Фикстура для сброса счётчиков перед каждым тестом ===
@@ -61,7 +61,6 @@ def test_product_count_initialization():
     assert Category.product_count == 2
 
 
-
 def test_product_count_multiple_categories():
     """Проверяет общий подсчёт продуктов в нескольких категориях"""
     product1 = Product("Телефон", "Смартфон", 50000.0, 10)
@@ -72,6 +71,7 @@ def test_product_count_multiple_categories():
     Category("Компьютеры", "Стационарные устройства", [product3])
 
     assert Category.product_count == 3
+
 
 # === Тесты для класса Product ===
 def test_product_initialization_with_positive_price():
@@ -94,7 +94,6 @@ def test_product_price_setter_with_valid_price():
     product = Product("Телефон", "Простой", 10000, 10)
     product.price = 12000
     assert product.price == 12000
-
 
 
 def test_product_new_product_with_invalid_type():
@@ -121,7 +120,6 @@ def test_category_products_property_format():
     assert category.products == expected
 
 
-
 def test_add_product_updates_counter():
     product = Product("Ноутбук", "Мощный", 99999.99, 5)
     category = Category("Электроника", "Техника")
@@ -130,3 +128,210 @@ def test_add_product_updates_counter():
     assert product in category._products
 
 
+def test_add_two_products():
+    """Проверяет, что сложение двух продуктов возвращает правильную общую стоимость"""
+    product1 = Product("Ноутбук", "Мощный", 100.0, 10)
+    product2 = Product("Смартфон", "Флагман", 200.0, 2)
+
+    total = product1 + product2
+    assert total == 1400.0  # 100 * 10 + 200 * 2 = 1400
+
+
+
+def test_add_with_negative_price(capfd):
+    """Проверяет, что отрицательная цена не учитывается в сумме"""
+    product1 = Product("Ноутбук", "Мощный", -100.0, 10)  # сеттер заблокирует это
+    product2 = Product("Смартфон", "Флагман", 200.0, 5)
+
+    # Проверяем, что цена не установлена
+    assert product1.price == 0  # так как была отрицательная цена
+
+    total = product1 + product2
+    assert total == 1000.0  # 0 * 10 + 200 * 5 = 1000
+
+
+def test_product_str():
+    product = Product("Ноутбук", "Мощный", 99999.99, 5)
+    assert str(product) == "Ноутбук, 99999 руб. Остаток: 5 шт."
+
+
+def test_category_str_with_total_quantity():
+    """Проверяет, что метод __str__ возвращает общее количество товаров"""
+    product1 = Product("Ноутбук", "Мощный", 99999.99, 5)
+    product2 = Product("Смартфон", "Флагман", 69999.99, 10)
+    category = Category("Электроника", "Техника", [product1, product2])
+
+    assert str(category) == "Электроника, общее количество товаров: 15 шт."
+
+
+def test_add_same_class_products():
+    smartphone1 = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                             "iPhone 13", 256, "Черный")
+    smartphone2 = Smartphone("Samsung", "Флагман", 90000, 10, "Exynos",
+                             "S23", 512, "Серебристый")
+    total = smartphone1 + smartphone2
+    assert total == 100000 * 5 + 90000 * 10
+
+
+def test_add_different_class_products():
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                            "iPhone 13", 256, "Черный")
+    grass = LawnGrass("Трава", "Для дачи", 500, 20, "Россия",
+                      "3 недели", "Зеленый")
+
+    with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
+        smartphone + grass
+
+
+def test_add_products_of_different_types_raises_type_error():
+    """Проверяет, что нельзя сложить товары разных типов"""
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                            "iPhone 13", 256, "Черный")
+    grass = LawnGrass("Трава", "Для дачи", 500, 20, "Россия",
+                      "3 недели", "Зелёный")
+    with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
+        smartphone + grass
+
+
+def test_add_subclass_to_category():
+    """Проверяет, что можно добавлять наследников Product"""
+    category = Category("Электроника", "Техника")
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                            "iPhone 13", 256, "Черный")
+    category.add_product(smartphone)
+    assert len(category._products) == 1
+
+
+def test_log_mixin_for_product(capsys):
+    """Проверяет, что при создании Product выводится лог в формате Product(название, описание, цена, количество)"""
+    Product("Ноутбук", "Мощный", 99999.99, 5)
+    captured = capsys.readouterr()
+    assert "Product(Ноутбук, Мощный, 99999.99, 5)" in captured.out
+
+
+def test_log_mixin_for_smartphone(capsys):
+    """Проверяет, что при создании Smartphone выводится лог в нужном формате"""
+    Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+               "iPhone 13", 256, "Черный")
+    captured = capsys.readouterr()
+    assert "Smartphone(iPhone, Флагман, 100000, 5)" in captured.out
+
+
+def test_log_mixin_for_lawn_grass(capsys):
+    """Проверяет, что при создании LawnGrass выводится лог в нужном формате"""
+    LawnGrass("Газонная трава", "Для дачи", 500, 20,
+              "Россия", "3 недели", "Зелёный")
+    captured = capsys.readouterr()
+    assert "LawnGrass(Газонная трава, Для дачи, 500, 20)" in captured.out
+
+
+def test_smartphone_initialization():
+    """Проверяет инициализацию атрибутов у смартфона"""
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                            "iPhone 13", 256, "Черный")
+    assert smartphone.name == "iPhone"
+    assert smartphone.description == "Флагман"
+    assert smartphone.price == 100000
+    assert smartphone.quantity == 5
+    assert smartphone.efficiency == "A15"
+    assert smartphone.model == "iPhone 13"
+    assert smartphone.memory == 256
+    assert smartphone.color == "Черный"
+
+
+def test_smartphone_str():
+    """Проверяет строковое представление смартфона"""
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15",
+                            "iPhone 13", 256, "Черный")
+    assert str(smartphone) == "iPhone, 100000 руб. Остаток: 5 шт., модель: iPhone 13, память: 256 ГБ, цвет: Черный"
+
+
+def test_lawn_grass_initialization():
+    """Проверяет инициализацию атрибутов у газонной травы"""
+    grass = LawnGrass("Газонная трава", "Для дачи", 500, 20, "Россия",
+                      "3 недели", "Зелёный")
+    assert grass.name == "Газонная трава"
+    assert grass.description == "Для дачи"
+    assert grass.price == 500
+    assert grass.quantity == 20
+    assert grass.country == "Россия"
+    assert grass.germination_period == "3 недели"
+    assert grass.color == "Зелёный"
+
+
+def test_lawn_grass_str():
+    """Проверяет строковое представление газонной травы"""
+    grass = LawnGrass("Газонная трава", "Для дачи", 500, 20, "Россия",
+                      "3 недели", "Зелёный")
+    assert str(grass) == ("Газонная трава, 500 руб. Остаток: 20 шт., страна: Россия, "
+                          "срок прорастания: 3 недели, цвет: Зелёный")
+
+
+def test_add_products_of_different_types():
+    """Проверяет, что нельзя сложить товары разных типов"""
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    grass = LawnGrass("Газонная трава", "Для дачи", 500, 20, "Россия", "3 недели", "Зелёный")
+    with pytest.raises(TypeError, match="Можно складывать только товары одного типа"):
+        smartphone + grass
+
+
+def test_add_valid_product_to_category():
+    """Проверяет, что можно добавить корректный продукт в категорию"""
+    product = Product("Товар", "Описание", 100, 10)
+    category = Category("Электроника", "Техника")
+    category.add_product(product)
+    assert len(category._products) == 1
+
+
+def test_add_smartphone_to_category():
+    """Проверяет, что можно добавить смартфон в категорию"""
+    smartphone = Smartphone("iPhone", "Флагман", 100000, 5, "A15", "iPhone 13", 256, "Черный")
+    category = Category("Электроника", "Техника")
+    category.add_product(smartphone)
+    assert len(category._products) == 1
+
+
+def test_add_lawn_grass_to_category():
+    """Проверяет, что можно добавить газонную траву в категорию"""
+    grass = LawnGrass("Газонная трава", "Для дачи", 500, 20, "Россия", "3 недели", "Зелёный")
+    category = Category("Сад", "Растения")
+    category.add_product(grass)
+    assert len(category._products) == 1
+
+
+
+def test_add_with_zero_price():
+    """Проверяет, что товар с нулевой ценой не влияет на сумму"""
+    product1 = Product("Товар", "Описание", 0, 10)
+    product2 = Product("Товар2", "Описание2", 200, 5)
+    assert product1.price == 0
+    assert product1 + product2 == 1000  # 0 * 10 + 200 * 5 = 1000
+
+
+def test_product_with_zero_quantity_raises_error():
+    """Проверяет, что при попытке создать товар с quantity=0 выбрасывается ValueError"""
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Товар", "Описание", 100, 0)
+
+
+from src.classes import Product, Category
+
+
+def test_product_with_negative_quantity_raises_error():
+    """Проверяет, что при попытке создать товар с quantity<0 выбрасывается ValueError"""
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Товар", "Описание", 100, -5)
+
+
+def test_category_with_no_products_returns_zero_middle_price():
+    """Проверяет, что у пустой категории average_price == 0"""
+    category = Category("Электроника", "Техника")
+    assert category.middle_price() == 0
+
+
+def test_category_middle_price():
+    """Проверяет, что метод average_price корректно считает среднюю цену"""
+    product1 = Product("Товар1", "Описание1", 100, 10)
+    product2 = Product("Товар2", "Описание2", 200, 5)
+    category = Category("Электроника", "Техника", [product1, product2])
+    assert category.middle_price() == (100 + 200) / 2  # (100 + 200) / 2 = 150.0

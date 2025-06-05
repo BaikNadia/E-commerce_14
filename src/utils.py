@@ -3,6 +3,7 @@ from typing import List
 
 from src.classes import Category, Product
 
+
 def load_data_from_json() -> List[Category]:
     """
     Загружает данные из файла data/products.json и создаёт объекты классов Product и Category.
